@@ -3,6 +3,7 @@ package com.example.db.controller;
 import java.io.File;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -73,144 +74,39 @@ public class MemberProfileController {
 
 
 	// myProfile.jsp - 내 프로필 수정하기
+	@Value("${file.upload.path}")
+	private String uploadPath;
+
 	@PostMapping("/profile/updateProfile.do")
 	public String updateProfile(
-	    MemberProfileVo profileVo,
-	    @RequestParam(required = false) MultipartFile mem_photo,
-	    HttpSession session
+			MemberProfileVo profileVo,
+			@RequestParam(required = false) MultipartFile mem_photo,
+			HttpSession session
 	) throws Exception {
 
-	    MemberVo user = (MemberVo) session.getAttribute("user");
-	    profileVo.setMem_idx(user.getMem_idx());
+		MemberVo user = (MemberVo) session.getAttribute("user");
+		profileVo.setMem_idx(user.getMem_idx());
 
-	    if (mem_photo != null && !mem_photo.isEmpty()) {
-	        String uploadPath = "C:/upload/profile/";
-	        File dir = new File(uploadPath);
-	        if (!dir.exists()) dir.mkdirs();
+		if (mem_photo != null && !mem_photo.isEmpty()) {
+			File dir = new File(uploadPath);
+			if (!dir.exists()) dir.mkdirs();
 
-	        String fileName = System.currentTimeMillis() + "_" + mem_photo.getOriginalFilename();
-	        mem_photo.transferTo(new File(uploadPath + fileName));
+			String fileName = System.currentTimeMillis() + "_" + mem_photo.getOriginalFilename();
+			mem_photo.transferTo(new File(uploadPath + fileName));
 
-	        profileVo.setMem_img(fileName); // ⭐ String으로 직접 세팅
-	    }
+			profileVo.setMem_img(fileName);
+		}
 
-	    MemberProfileVo exist =
-	        memberDao.selectProfileByMemIdx(user.getMem_idx());
+		MemberProfileVo exist = memberDao.selectProfileByMemIdx(user.getMem_idx());
 
-	    if (exist == null) {
-	        memberDao.insertProfile(profileVo);
-	    } else {
-	        memberDao.updateProfile(profileVo);
-	    }
+		if (exist == null) {
+			memberDao.insertProfile(profileVo);
+		} else {
+			memberDao.updateProfile(profileVo);
+		}
 
-	    return "redirect:/profile/myProfile.do";
+		return "redirect:/profile/myProfile.do";
 	}
-	
-//	@PostMapping("/profile/updateProfile.do")
-//	public String updateProfile(
-//	    MemberProfileVo profileVo,
-//	    @RequestParam(required = false) MultipartFile mem_img,
-//	    HttpSession session
-//	) throws Exception {
-//
-//	    MemberVo user = (MemberVo) session.getAttribute("user");
-//	    profileVo.setMem_idx(user.getMem_idx());
-//
-//	    // ⭐⭐⭐ 여기! 이게 그 if문 자리야 ⭐⭐⭐
-//	    if (mem_img != null && !mem_img.isEmpty()) {
-//
-//	        String uploadPath = "C:/upload/profile/";
-//	        File dir = new File(uploadPath);
-//	        if (!dir.exists()) dir.mkdirs();
-//
-//	        String fileName = System.currentTimeMillis() + "_" + mem_img.getOriginalFilename();
-//	        File saveFile = new File(uploadPath + fileName);
-//
-//	        mem_img.transferTo(saveFile);
-//
-//	        // DB에 들어갈 파일명 세팅
-//	        profileVo.setMem_img(fileName);
-//	    }
-//
-//	    // 기존 프로필 존재 여부 확인
-//	    MemberProfileVo existing =
-//	        memberDao.selectProfileByMemIdx(user.getMem_idx());
-//
-//	    if (existing == null) {
-//	        memberDao.insertProfile(profileVo);
-//	    } else {
-//	        memberDao.updateProfile(profileVo);
-//	    }
-//
-//	    return "redirect:/profile/myProfile.do";
-//	}
-	
-//	@PostMapping("/profile/updateProfile.do")
-//	public String updateProfile(
-//	    MemberProfileVo profileVo,
-//	    @RequestParam(required = false) MultipartFile mem_img,
-//	    HttpSession session
-//	) {
-//	    MemberVo user = (MemberVo) session.getAttribute("user");
-//	    profileVo.setMem_idx(user.getMem_idx());
-//
-//	    // ⭐ 기존 프로필 존재 여부 확인
-//	    MemberProfileVo existing =
-//	        memberDao.selectProfileByMemIdx(user.getMem_idx());
-//
-//	    if (existing == null) {
-//	        // 👉 없으면 INSERT
-//	        memberDao.insertProfile(profileVo);
-//	    } else {
-//	        // 👉 있으면 UPDATE
-//	        memberDao.updateProfile(profileVo);
-//	    }
-//
-//	    session.setAttribute("user",
-//	        memberDao.selectOneFromId(user.getMem_id())
-//	    );
-//
-//	    return "redirect:/profile/myProfile.do";
-//	}
-	
-//	@PostMapping("/profile/updateProfile.do")
-//	public String updateProfile(
-//	    MemberProfileVo profileVo,
-//	    HttpSession session
-//	) {
-//	    MemberVo user = (MemberVo) session.getAttribute("user");
-//	    profileVo.setMem_idx(user.getMem_idx());
-//
-//	    memberDao.updateProfile(profileVo);
-//
-//	    // 세션 갱신
-//	    session.setAttribute("user",
-//	        memberDao.selectOneFromId(user.getMem_id())
-//	    );
-//
-//	    return "redirect:/profile/myProfile.do";
-//	}
-	
-	
-//	// myUpdate.jsp - 회원 정보 수정 창 띄우기
-//	@RequestMapping("/update/myUpdate.do")
-//	public String myUpdate() {
-//		
-//		return "update/myUpdate";
-//	}
-	
-	
-	// 수정 ------------------------------------------------------------------------------------------
-	
-	
-//	// 멤버컨트롤러와 중복?
-//	@RequestMapping("/update/myUpdate.do")
-//	public String myUpdate(MemberVo vo, Model model) {
-//		
-//	       model.addAttribute("vo",vo);
-//		
-//	    return "update/myUpdate"; 
-//	}
 	
 	
 	// 탈퇴 관련 ------------------------------------------------------------------------------------------

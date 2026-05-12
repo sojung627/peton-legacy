@@ -80,10 +80,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	        #{mem_name},
 	        #{mem_tel},
 	        #{mem_email},
-	        #{mem_ip},      <!-- mem_ip 없어서 회원가입 오류남. 정은 수정 -->
+	        #{mem_ip},
 	        1,              
 	        1,              
-	        #{mem_bday}, <!-- varchar 아니고 date. MyBatis 알아서 연결하므로 type 설정 x -->
+	        #{mem_bday},
 	        NOW()
 	    )
 	</insert>

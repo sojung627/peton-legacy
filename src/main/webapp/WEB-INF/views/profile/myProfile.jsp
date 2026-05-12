@@ -139,11 +139,6 @@ window.onload = function() {
         saveBtn.style.cursor = "pointer";
     }
 }
-	
-	
-
-
-
 </script>
 </head>
 <body class="bg-gray-50 layout-body">
